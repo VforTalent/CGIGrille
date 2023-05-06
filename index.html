@@ -1,21 +1,84 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>List of websites with preview iframes</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <title>ROCOBOT by Vfor Talent</title>
+    <style>
+      .iframe-wrapper {
+        position: relative;
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        overflow: hidden;
+      }
+      .iframe-wrapper > iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
   </head>
   <body>
-    <div class="grid-container">
-      <div class="grid-item">
-        <iframe src="https://www.vforstudio.com"></iframe>
-        <div class="overlay">Vfor</div>
-      </div>
-      <div class="grid-item">
-        <iframe src="https://xk.studio"></iframe>
-        <div class="overlay">XK</div>
-      </div>
-      <!-- Ajoutez plus d'éléments de grille ici pour plus de sites web -->
-    </div>
+    <h1>ROCOBOT by Vfor Talent</h1>
+    <div id="iframes-container"></div>
+    <script>
+      const iframeList = [
+        'https://wwww.vforstudio.com/',
+        'https://www.dkft.fr/',
+        'https://nexusstudios.com/',
+        'http://www.mikrosimage.com/'
+      ];
+
+      const threshold = 0.2;
+
+      const referenceList = [];
+
+      function createIframeWrapper(url) {
+        const iframeWrapper = document.createElement('div');
+        iframeWrapper.classList.add('iframe-wrapper');
+        iframeWrapper.setAttribute('data-loaded', 'false');
+        iframeWrapper.setAttribute('data-url', url);
+
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('src', url);
+        iframe.setAttribute('loading', 'lazy');
+        iframeWrapper.appendChild(iframe);
+
+        return iframeWrapper;
+      }
+
+      function lazyLoadIframes() {
+        const windowHeight = window.innerHeight;
+        const scrollTop =
+          window.pageYOffset || document.documentElement.scrollTop;
+        const visibleArea = windowHeight + scrollTop;
+
+        referenceList.forEach((iframeWrapper) => {
+          if (iframeWrapper.getAttribute('data-loaded') === 'false') {
+            const iframeOffsetTop =
+              iframeWrapper.getBoundingClientRect().top + scrollTop;
+            const iframeHeight = iframeWrapper.offsetHeight;
+            const iframeVisibleStart =
+              iframeOffsetTop + iframeHeight * threshold;
+
+            if (iframeVisibleStart < visibleArea) {
+              const iframe = iframeWrapper.querySelector('iframe');
+              const iframeSrc = iframeWrapper.getAttribute('data-url');
+              iframe.setAttribute('src', iframeSrc);
+              iframeWrapper.setAttribute('data-loaded', 'true');
+            }
+          }
+        });
+      }
+
+      iframeList.forEach((url) => {
+        const iframeWrapper = createIframeWrapper(url);
+        referenceList.push(iframeWrapper);
+        document.body.appendChild(iframeWrapper);
+      });
+
+      window.addEventListener('scroll', lazyLoadIframes);
+    </script>
   </body>
 </html>
